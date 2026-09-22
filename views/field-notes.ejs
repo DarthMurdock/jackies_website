@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Notes — <%= content.site.title %></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Courier+Prime&family=Libre+Franklin:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="wrap">
+    <div class="site-title serif"><%= content.site.title %></div>
+    <nav class="nav-links mono">
+      <a href="/#collections">Collections</a>
+      <a href="/#about">Meet the Artist</a>
+      <a href="/field-notes">Field Notes</a>
+      <a href="/?cat=Side%20Project#collections">Side Projects</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap">
+    <a class="piece-detail-back" href="/">&larr; Back home</a>
+
+    <div class="section-head">
+      <h2 class="serif">Field Notes</h2>
+    </div>
+
+    <% if (posts.length === 0) { %>
+      <p class="piece-detail-empty">No field notes posted yet — check back soon.</p>
+    <% } else { %>
+      <div class="fieldnote-feed">
+        <% posts.forEach(function(post) { %>
+          <article class="fieldnote-post">
+            <div class="fieldnote-post-head">
+              <h3 class="serif"><%= post.title %></h3>
+              <div class="fieldnote-post-date mono"><%= post.date %></div>
+            </div>
+            <% if (post.body) { %>
+              <p class="fieldnote-post-body"><%= post.body %></p>
+            <% } %>
+            <% if (post.images && post.images.length > 0) { %>
+              <div class="fieldnote-post-photos">
+                <% post.images.forEach(function(src) { %>
+                  <img src="<%= src %>" alt="<%= post.title %>">
+                <% }) %>
+              </div>
+            <% } %>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap"><%= content.footer.copyright %></div>
+</footer>
+
+</body>
+</html>

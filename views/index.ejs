@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= content.site.title %></title>
+<meta name="description" content="<%= content.hero.paragraph %>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Courier+Prime&family=Libre+Franklin:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="wrap">
+    <div class="site-title serif"><%= content.site.title %></div>
+    <nav class="nav-links mono">
+      <a href="#collections">Collections</a>
+      <a href="#about">Meet the Artist</a>
+      <a href="/field-notes">Field Notes</a>
+      <a href="/?cat=Side%20Project#collections">Side Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-text">
+      <div class="hero-eyebrow"><%= content.hero.eyebrow %></div>
+      <h1 class="serif"><%= content.hero.headingLine1 %><br><%= content.hero.headingLine2 %></h1>
+      <p><%= content.hero.paragraph %></p>
+      <a class="hero-cta mono" href="#collections"><%= content.hero.cta %></a>
+    </div>
+    <div class="specimen-frame">
+      <div class="corner tl"></div>
+      <div class="corner br"></div>
+      <div class="specimen-box">
+        <div class="pin"></div>
+        <img src="<%= content.hero.specimenImage %>" alt="<%= content.hero.specimenLabel %>" data-lightbox>
+        <div class="specimen-label mono"><%= content.hero.specimenLabel %></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="collections">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="serif">The Collection</h2>
+    </div>
+    <div class="filters">
+      <a href="/#collections" class="<%= !activeCategory ? 'active' : '' %>">All</a>
+      <% categories.forEach(function(cat) { %>
+        <a href="/?cat=<%= encodeURIComponent(cat) %>#collections" class="<%= activeCategory === cat ? 'active' : '' %>"><%= cat %></a>
+      <% }) %>
+    </div>
+    <div class="gallery-grid">
+      <% pieces.forEach(function(piece) { %>
+        <a class="piece-card" href="/piece/<%= piece.id %>">
+          <div class="piece-card-photo">
+            <% if (piece.images && piece.images.length > 0) { %>
+              <img src="<%= piece.images[0] %>" alt="<%= piece.title %>">
+            <% } else { %>
+              <div class="piece-card-photo-empty mono">No photo yet</div>
+            <% } %>
+            <% if (piece.images && piece.images.length > 1) { %>
+              <span class="photo-count-badge mono"><%= piece.images.length %> photos</span>
+            <% } %>
+          </div>
+          <div class="piece-card-body">
+            <div class="piece-card-title serif"><%= piece.title %></div>
+            <div class="piece-card-meta mono"><%= piece.category %> &mdash; <%= piece.year %></div>
+          </div>
+        </a>
+      <% }) %>
+      <% if (pieces.length === 0) { %>
+        <p style="color: var(--muted);">Nothing in this category yet.</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="serif"><%= content.about.heading %></h2>
+    </div>
+    <div class="about-block">
+      <% if (content.about.photo) { %>
+        <img class="about-photo" src="<%= content.about.photo %>" alt="<%= content.about.heading %>" data-lightbox>
+      <% } %>
+      <p class="about-body"><%= content.about.bio %></p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="field-notes">
+  <div class="wrap widgets">
+    <div class="pinned-card">
+      <div class="corner tl"></div>
+      <div class="corner br"></div>
+      <div class="pinned-label mono"><%= content.fieldNotes.pinnedLabel %></div>
+      <% if (latestPost) { %>
+        <div class="pinned-body">
+          <% if (latestPost.images && latestPost.images.length > 0) { %>
+            <img class="pinned-photo" src="<%= latestPost.images[0] %>" alt="<%= latestPost.title %>" data-lightbox>
+          <% } %>
+          <div class="pinned-text-block">
+            <div class="pinned-text serif"><%= latestPost.title %></div>
+            <div class="pinned-date mono"><%= latestPost.date %></div>
+            <p class="pinned-excerpt"><%= latestPost.body.length > 220 ? latestPost.body.slice(0, 220).trim() + '…' : latestPost.body %></p>
+          </div>
+        </div>
+      <% } else { %>
+        <p class="pinned-excerpt">No field notes posted yet.</p>
+      <% } %>
+      <a class="pinned-link mono" href="/field-notes">Read all Field Notes &rarr;</a>
+    </div>
+    <div class="contact-block" id="contact">
+      <h3 class="serif">Inquiries</h3>
+      <a class="mono" href="mailto:<%= content.contact.email %>"><%= content.contact.email %></a>
+      <span class="mono"><%= content.contact.instagram %></span>
+      <% if (content.contact.youtube) { %>
+        <a class="social-icon mono" href="<%= content.contact.youtube %>" target="_blank" rel="noopener">
+          <svg viewBox="0 0 32 32" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="8" width="28" height="16" rx="5"></rect>
+            <path d="M13 12.5 L21 16 L13 19.5 Z" fill="currentColor" stroke="none"></path>
+          </svg>
+          <span>Visit My YouTube Channel</span>
+        </a>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap"><%= content.footer.copyright %></div>
+</footer>
+
+<div id="lightbox" class="lightbox" hidden>
+  <button type="button" class="lightbox-close" aria-label="Close">&times;</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightbox-img');
+
+  function openLightbox(src, alt) {
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    lightbox.hidden = false;
+  }
+  function closeLightbox() {
+    lightbox.hidden = true;
+    lightboxImg.src = '';
+  }
+
+  document.querySelectorAll('[data-lightbox]').forEach(function (img) {
+    img.addEventListener('click', function () {
+      openLightbox(img.getAttribute('src'), img.getAttribute('alt'));
+    });
+  });
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+      closeLightbox();
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+  });
+</script>
+
+</body>
+</html>

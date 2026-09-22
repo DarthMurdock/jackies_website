@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= piece.title %> — <%= content.site.title %></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Courier+Prime&family=Libre+Franklin:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="wrap">
+    <div class="site-title serif"><%= content.site.title %></div>
+    <nav class="nav-links mono">
+      <a href="/#collections">Collections</a>
+      <a href="/#about">Meet the Artist</a>
+      <a href="/field-notes">Field Notes</a>
+      <a href="/?cat=Side%20Project#collections">Side Projects</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap">
+    <a class="piece-detail-back" href="/#collections">&larr; Back to the Collection</a>
+
+    <div class="piece-detail-head">
+      <h1 class="serif"><%= piece.title %></h1>
+      <div class="piece-detail-meta"><%= piece.category %> &mdash; <%= piece.year %></div>
+    </div>
+
+    <div class="piece-photos">
+      <% if (piece.images && piece.images.length > 0) { %>
+        <% piece.images.forEach(function(src) { %>
+          <img src="<%= src %>" alt="<%= piece.title %>">
+        <% }) %>
+      <% } else { %>
+        <p class="piece-detail-empty">No photos have been added for this piece yet.</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap"><%= content.footer.copyright %></div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edit — <%= content.site.title %></title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Libre+Franklin:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <h1>Edit your site</h1>
+      <div>
+        <a class="btn btn-secondary" href="/" target="_blank" style="margin-right:10px;">View live site</a>
+        <a class="logout" href="/admin/logout">Sign out</a>
+      </div>
+    </div>
+
+    <% if (saved) { %>
+      <div class="flash">Saved. <a href="/" target="_blank">View your changes</a></div>
+    <% } %>
+
+    <form method="POST" action="/admin/save" enctype="multipart/form-data">
+
+      <div class="admin-card">
+        <h2>Site Title</h2>
+        <div class="admin-field">
+          <label>Site name (shown top-left and in browser tabs)</label>
+          <input type="text" name="site_title" value="<%= content.site.title %>">
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>Homepage Introduction</h2>
+        <p class="admin-note">This is the big welcome text at the top of your site.</p>
+        <div class="admin-field">
+          <label>Small label above the title</label>
+          <input type="text" name="hero_eyebrow" value="<%= content.hero.eyebrow %>">
+        </div>
+        <div class="admin-field">
+          <label>Title, line 1</label>
+          <input type="text" name="hero_heading_1" value="<%= content.hero.headingLine1 %>">
+        </div>
+        <div class="admin-field">
+          <label>Title, line 2</label>
+          <input type="text" name="hero_heading_2" value="<%= content.hero.headingLine2 %>">
+        </div>
+        <div class="admin-field">
+          <label>Welcome paragraph</label>
+          <textarea name="hero_paragraph"><%= content.hero.paragraph %></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Button text</label>
+          <input type="text" name="hero_cta" value="<%= content.hero.cta %>">
+        </div>
+        <div class="admin-field">
+          <label>Featured photo (the pinned specimen image, top right)</label>
+          <div class="admin-piece" style="flex-direction:row;align-items:center;">
+            <img class="admin-specimen-thumb" src="<%= content.hero.specimenImage %>" alt="">
+            <div style="flex:1 1 260px;">
+              <input type="text" name="hero_specimen_label" value="<%= content.hero.specimenLabel %>" placeholder="Caption for this photo" style="margin-bottom:8px;width:100%;padding:8px 10px;border:1px solid #DED2BC;border-radius:5px;">
+              <input type="file" name="hero_specimen_image" accept="image/*">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>The Collection (your pieces)</h2>
+        <p class="admin-note">Each piece can have as many photos as you want. Give it a title, a category (Embroidery, Stop Motion, Photography, Side Project, Moth Journal, or your own word), and a year. The first photo is the "cover" photo — it's what shows on the gallery card — so use the &lsaquo; and &rsaquo; buttons to move photos earlier or later until the one you want is first. Click the &times; on a photo to remove just that photo, or "Remove This Piece" to take the whole thing off the site.</p>
+        <div id="pieces-container">
+          <% content.gallery.forEach(function(piece, i) { %>
+            <div class="admin-piece" data-row>
+              <input type="hidden" name="piece_id_<%= i %>" value="<%= piece.id %>">
+              <input type="hidden" name="piece_delete_<%= i %>" value="" data-row-delete-flag>
+              <div class="fields" style="grid-template-columns: 2fr 1fr 1fr; width: 100%;">
+                <input type="text" name="piece_title_<%= i %>" value="<%= piece.title %>" placeholder="Title">
+                <input type="text" name="piece_category_<%= i %>" value="<%= piece.category %>" placeholder="Category">
+                <input type="text" name="piece_year_<%= i %>" value="<%= piece.year %>" placeholder="Year">
+              </div>
+              <div class="admin-photos" data-photos>
+                <% (piece.images || []).forEach(function(src, j) { %>
+                  <div class="admin-photo-thumb" data-photo-row>
+                    <img src="<%= src %>" alt="">
+                    <input type="hidden" name="piece_image_current_<%= i %>_<%= j %>" value="<%= src %>" data-photo-current-input>
+                    <input type="hidden" name="piece_image_current_delete_<%= i %>_<%= j %>" value="" data-photo-delete-flag>
+                    <button type="button" class="btn-remove-photo" data-remove-photo title="Remove this photo">&times;</button>
+                    <button type="button" class="btn-move-photo btn-move-left" data-move-photo="-1" title="Move earlier (this one shows first when it's at the front)">&lsaquo;</button>
+                    <button type="button" class="btn-move-photo btn-move-right" data-move-photo="1" title="Move later">&rsaquo;</button>
+                  </div>
+                <% }) %>
+              </div>
+              <div class="upload-row">
+                <label style="white-space:nowrap;">Add photos:</label>
+                <input type="file" name="piece_new_images_<%= i %>" accept="image/*" multiple>
+                <button type="button" class="btn btn-danger" data-remove-row>Remove This Piece</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+        <button type="button" id="add-piece" class="btn btn-secondary">+ Add a New Piece</button>
+      </div>
+
+      <div class="admin-card">
+        <h2>Meet the Artist</h2>
+        <div class="admin-field">
+          <label>Section heading</label>
+          <input type="text" name="about_heading" value="<%= content.about.heading %>">
+        </div>
+        <div class="admin-field">
+          <label>Your bio</label>
+          <textarea name="about_bio" style="min-height:160px;"><%= content.about.bio %></textarea>
+        </div>
+        <div class="admin-field">
+          <label>Your photo (shown next to your bio)</label>
+          <div class="admin-piece" style="flex-direction:row;align-items:center;">
+            <% if (content.about.photo) { %>
+              <img class="admin-specimen-thumb" src="<%= content.about.photo %>" alt="">
+            <% } %>
+            <div style="flex:1 1 260px;">
+              <input type="file" name="about_photo" accept="image/*">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>Field Notes</h2>
+        <p class="admin-note">A blog-style feed for progress updates — write about what you're working on and add photos as you go. Your homepage always shows the most recent post (by date), including its first photo, with a link to the full Field Notes page. Use the &lsaquo; and &rsaquo; buttons to reorder a post's photos — the first one is the one shown on your homepage. Click &times; on a photo to remove just that photo, or "Remove This Post" to take the whole post off the site.</p>
+        <div class="admin-field">
+          <label>Small label shown above the latest post on your homepage</label>
+          <input type="text" name="fieldnotes_label" value="<%= content.fieldNotes.pinnedLabel %>">
+        </div>
+        <div id="fieldnotes-container">
+          <% content.fieldNotes.posts.forEach(function(post, i) { %>
+            <div class="admin-piece" data-row>
+              <input type="hidden" name="fieldnote_id_<%= i %>" value="<%= post.id %>">
+              <input type="hidden" name="fieldnote_delete_<%= i %>" value="" data-row-delete-flag>
+              <div class="fields" style="grid-template-columns: 2fr 1fr; width: 100%;">
+                <input type="text" name="fieldnote_title_<%= i %>" value="<%= post.title %>" placeholder="Post title">
+                <input type="date" name="fieldnote_date_<%= i %>" value="<%= post.date %>">
+              </div>
+              <textarea name="fieldnote_body_<%= i %>" placeholder="What are you working on?" style="width:100%;min-height:110px;padding:8px 10px;border:1px solid #DED2BC;border-radius:5px;font-family:inherit;font-size:14px;"><%= post.body %></textarea>
+              <div class="admin-photos" data-photos>
+                <% (post.images || []).forEach(function(src, j) { %>
+                  <div class="admin-photo-thumb" data-photo-row>
+                    <img src="<%= src %>" alt="">
+                    <input type="hidden" name="fieldnote_image_current_<%= i %>_<%= j %>" value="<%= src %>" data-photo-current-input>
+                    <input type="hidden" name="fieldnote_image_current_delete_<%= i %>_<%= j %>" value="" data-photo-delete-flag>
+                    <button type="button" class="btn-remove-photo" data-remove-photo title="Remove this photo">&times;</button>
+                    <button type="button" class="btn-move-photo btn-move-left" data-move-photo="-1" title="Move earlier (this one shows on your homepage when it's at the front)">&lsaquo;</button>
+                    <button type="button" class="btn-move-photo btn-move-right" data-move-photo="1" title="Move later">&rsaquo;</button>
+                  </div>
+                <% }) %>
+              </div>
+              <div class="upload-row">
+                <label style="white-space:nowrap;">Add photos:</label>
+                <input type="file" name="fieldnote_new_images_<%= i %>" accept="image/*" multiple>
+                <button type="button" class="btn btn-danger" data-remove-row>Remove This Post</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+        <button type="button" id="add-fieldnote" class="btn btn-secondary">+ Add a New Field Note</button>
+      </div>
+
+      <div class="admin-card">
+        <h2>Contact Info</h2>
+        <div class="admin-field">
+          <label>Email address</label>
+          <input type="email" name="contact_email" value="<%= content.contact.email %>">
+        </div>
+        <div class="admin-field">
+          <label>Instagram handle</label>
+          <input type="text" name="contact_instagram" value="<%= content.contact.instagram %>">
+        </div>
+        <div class="admin-field">
+          <label>YouTube channel link (leave blank to hide the icon on your site)</label>
+          <input type="text" name="contact_youtube" value="<%= content.contact.youtube || '' %>" placeholder="https://youtube.com/@yourhandle">
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>Footer</h2>
+        <div class="admin-field">
+          <label>Copyright line</label>
+          <input type="text" name="footer_copyright" value="<%= content.footer.copyright %>">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" style="font-size:16px;padding:14px 28px;">Save Changes</button>
+    </form>
+  </div>
+
+<script>
+  // After a photo is moved, the hidden inputs' names still carry their
+  // ORIGINAL position (piece_image_current_i_j) — but the server trusts
+  // that j to mean "this is photo j in the final order". So after any
+  // reorder we renumber every remaining thumb's j to match its new DOM
+  // position, deriving the "piece"/"fieldnote" prefix and row index i from
+  // the row's own delete-flag input rather than hard-coding it, so this one
+  // function works for both The Collection and Field Notes.
+  function resyncPhotoIndices(pieceRow, photosContainer) {
+    var rowFlag = pieceRow.querySelector('[data-row-delete-flag]');
+    if (!rowFlag) return;
+    var match = rowFlag.name.match(/^(.+)_delete_(\d+)$/);
+    if (!match) return;
+    var prefix = match[1];
+    var rowIndex = match[2];
+    var thumbs = photosContainer.querySelectorAll('[data-photo-row]');
+    thumbs.forEach(function (thumb, j) {
+      var currentInput = thumb.querySelector('[data-photo-current-input]');
+      var deleteInput = thumb.querySelector('[data-photo-delete-flag]');
+      if (currentInput) currentInput.name = prefix + '_image_current_' + rowIndex + '_' + j;
+      if (deleteInput) deleteInput.name = prefix + '_image_current_delete_' + rowIndex + '_' + j;
+    });
+  }
+
+  // Shared wiring for a repeating "add row / remove row / remove or reorder
+  // a photo" section — used for both The Collection and Field Notes below.
+  function setupRepeatingSection(containerEl, addButtonEl, startIndex, makeRowHtml) {
+    var nextIndex = startIndex;
+
+    if (addButtonEl) {
+      addButtonEl.addEventListener('click', function () {
+        var row = document.createElement('div');
+        row.className = 'admin-piece';
+        row.setAttribute('data-row', '');
+        row.innerHTML = makeRowHtml(nextIndex);
+        containerEl.appendChild(row);
+        nextIndex++;
+      });
+    }
+
+    containerEl.addEventListener('click', function (e) {
+      if (e.target.matches('[data-remove-row]')) {
+        var row = e.target.closest('[data-row]');
+        var flag = row.querySelector('[data-row-delete-flag]');
+        flag.value = 'true';
+        row.style.display = 'none';
+      }
+      if (e.target.matches('[data-remove-photo]')) {
+        var photoRow = e.target.closest('[data-photo-row]');
+        var photoFlag = photoRow.querySelector('[data-photo-delete-flag]');
+        photoFlag.value = 'true';
+        photoRow.style.display = 'none';
+      }
+      if (e.target.matches('[data-move-photo]')) {
+        var thumb = e.target.closest('[data-photo-row]');
+        var photosContainer = thumb.closest('[data-photos]');
+        var pieceRow = thumb.closest('[data-row]');
+        var direction = parseInt(e.target.getAttribute('data-move-photo'), 10);
+        if (direction < 0) {
+          var prev = thumb.previousElementSibling;
+          if (prev) photosContainer.insertBefore(thumb, prev);
+        } else {
+          var next = thumb.nextElementSibling;
+          if (next) photosContainer.insertBefore(next, thumb);
+        }
+        resyncPhotoIndices(pieceRow, photosContainer);
+      }
+    });
+  }
+
+  setupRepeatingSection(
+    document.getElementById('pieces-container'),
+    document.getElementById('add-piece'),
+    <%= content.gallery.length %>,
+    function (i) {
+      return (
+        '<input type="hidden" name="piece_id_' + i + '" value="">' +
+        '<input type="hidden" name="piece_delete_' + i + '" value="" data-row-delete-flag>' +
+        '<div class="fields" style="grid-template-columns: 2fr 1fr 1fr; width: 100%;">' +
+          '<input type="text" name="piece_title_' + i + '" placeholder="Title">' +
+          '<input type="text" name="piece_category_' + i + '" placeholder="Category">' +
+          '<input type="text" name="piece_year_' + i + '" placeholder="Year">' +
+        '</div>' +
+        '<div class="admin-photos" data-photos></div>' +
+        '<div class="upload-row">' +
+          '<label style="white-space:nowrap;">Add photos:</label>' +
+          '<input type="file" name="piece_new_images_' + i + '" accept="image/*" multiple>' +
+          '<button type="button" class="btn btn-danger" data-remove-row>Remove This Piece</button>' +
+        '</div>'
+      );
+    }
+  );
+
+  setupRepeatingSection(
+    document.getElementById('fieldnotes-container'),
+    document.getElementById('add-fieldnote'),
+    <%= content.fieldNotes.posts.length %>,
+    function (i) {
+      var today = new Date().toISOString().slice(0, 10);
+      return (
+        '<input type="hidden" name="fieldnote_id_' + i + '" value="">' +
+        '<input type="hidden" name="fieldnote_delete_' + i + '" value="" data-row-delete-flag>' +
+        '<div class="fields" style="grid-template-columns: 2fr 1fr; width: 100%;">' +
+          '<input type="text" name="fieldnote_title_' + i + '" placeholder="Post title">' +
+          '<input type="date" name="fieldnote_date_' + i + '" value="' + today + '">' +
+        '</div>' +
+        '<textarea name="fieldnote_body_' + i + '" placeholder="What are you working on?" style="width:100%;min-height:110px;padding:8px 10px;border:1px solid #DED2BC;border-radius:5px;font-family:inherit;font-size:14px;"></textarea>' +
+        '<div class="admin-photos" data-photos></div>' +
+        '<div class="upload-row">' +
+          '<label style="white-space:nowrap;">Add photos:</label>' +
+          '<input type="file" name="fieldnote_new_images_' + i + '" accept="image/*" multiple>' +
+          '<button type="button" class="btn btn-danger" data-remove-row>Remove This Post</button>' +
+        '</div>'
+      );
+    }
+  );
+</script>
+</body>
+</html>

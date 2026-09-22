@@ -1,0 +1,19 @@
+[Unit]
+Description=Jackie's Whimsical Collection website
+After=network.target
+# /mnt/PI_Projects is a separate mount, not the pi user's home folder —
+# this makes sure it's actually mounted before the site tries to start:
+RequiresMountsFor=/mnt/PI_Projects
+
+[Service]
+Type=simple
+# Change this if you move the project somewhere else:
+WorkingDirectory=/mnt/PI_Projects/jackies-collection
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+User=cowgillp
+EnvironmentFile=/mnt/PI_Projects/jackies-collection/.env
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#1B453C"/>
+  <rect x="0.5" y="0.5" width="399" height="399" fill="none" stroke="#3E6157"/>
+  <g transform="translate(140,120) scale(3.75)" fill="none" stroke="#C9A24B" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 4 L18 13 L27 15 L18 17 L16 26 L14 17 L5 15 L14 13 Z"/>
+  </g>
+  <text x="200" y="330" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="17" fill="#F4E8C9">Something New</text>
+  <text x="200" y="356" text-anchor="middle" font-family="monospace" font-size="10" letter-spacing="1" fill="#B9A77C">PLACEHOLDER — REPLACE IN /ADMIN</text>
+</svg>

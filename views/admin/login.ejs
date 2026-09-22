@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in — <%= content.site.title %> Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Libre+Franklin:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+  <div class="admin-wrap">
+    <div class="admin-card login-card">
+      <h2>Sign in to edit the site</h2>
+      <% if (error) { %>
+        <div class="flash" style="background:#F6DCD4;border-color:#E3B9AC;"><%= error %></div>
+      <% } %>
+      <form method="POST" action="/admin/login">
+        <div class="admin-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autofocus required>
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

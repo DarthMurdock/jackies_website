@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#1B453C"/>
+  <rect x="0.5" y="0.5" width="399" height="399" fill="none" stroke="#3E6157"/>
+  <g transform="translate(140,120) scale(3.75)" fill="none" stroke="#C9A24B" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="6" width="24" height="20" rx="1.5"/><line x1="4" y1="12" x2="10" y2="12"/><line x1="4" y1="20" x2="10" y2="20"/><line x1="22" y1="12" x2="28" y2="12"/><line x1="22" y1="20" x2="28" y2="20"/><rect x="12" y="10" width="8" height="12" rx="1"/>
+  </g>
+  <text x="200" y="330" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="17" fill="#F4E8C9">Nocturne (still)</text>
+  <text x="200" y="356" text-anchor="middle" font-family="monospace" font-size="10" letter-spacing="1" fill="#B9A77C">PLACEHOLDER — REPLACE IN /ADMIN</text>
+</svg>
