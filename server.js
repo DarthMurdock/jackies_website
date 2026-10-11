@@ -54,10 +54,15 @@ function readContent() {
 }
 
 function sortedFieldNotePosts(posts) {
+  // A post with a missing/invalid date sorts to the FRONT (treated as
+  // "now"), not the back — a bad date should be obvious and easy to
+  // notice/fix, not silently bury the post at the bottom of the feed.
   return [...(posts || [])].sort((a, b) => {
-    const ta = Date.parse(a.date) || 0;
-    const tb = Date.parse(b.date) || 0;
-    return tb - ta;
+    const ta = Date.parse(a.date);
+    const tb = Date.parse(b.date);
+    const va = Number.isNaN(ta) ? Infinity : ta;
+    const vb = Number.isNaN(tb) ? Infinity : tb;
+    return vb - va;
   });
 }
 
@@ -264,7 +269,11 @@ app.post('/admin/save', requireAuth, upload.any(), (req, res, next) => {
       const postBody = (body[`fieldnote_body_${i}`] || '').trim();
       if (!trimmedTitle && !postBody) continue; // skip fully empty rows
 
-      const date = (body[`fieldnote_date_${i}`] || '').trim();
+      // A blank date would otherwise sort as the oldest possible post (see
+      // sortedFieldNotePosts below) and silently vanish to the bottom of the
+      // feed, so default it to today rather than persist an empty string.
+      const rawDate = (body[`fieldnote_date_${i}`] || '').trim();
+      const date = rawDate || new Date().toISOString().slice(0, 10);
       const existingId = (body[`fieldnote_id_${i}`] || '').trim();
       const id = existingId || slugify(trimmedTitle, `field-note-${Date.now()}-${i}`);
 
