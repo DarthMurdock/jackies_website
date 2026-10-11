@@ -127,8 +127,13 @@ app.get('/', (req, res) => {
   const content = readContent();
   const categories = [...new Set(content.gallery.map((p) => p.category))];
   const activeCategory = req.query.cat || null;
+  // Compare case-insensitively and ignore extra whitespace: the category
+  // field in /admin is free text, so "Side Project" vs "side project" (or a
+  // trailing space) would otherwise silently filter out every piece and
+  // show "Nothing in this category yet." even though matching pieces exist.
+  const normalizeCategory = (c) => String(c || '').trim().toLowerCase();
   const pieces = activeCategory
-    ? content.gallery.filter((p) => p.category === activeCategory)
+    ? content.gallery.filter((p) => normalizeCategory(p.category) === normalizeCategory(activeCategory))
     : content.gallery;
   const latestPost = sortedFieldNotePosts(content.fieldNotes.posts)[0] || null;
 
