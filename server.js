@@ -21,11 +21,20 @@ function readContent() {
 
   // Migrate older entries that only had a single "image" string to the
   // current "images" array format, so nothing already saved gets lost.
-  content.gallery = (content.gallery || []).map((piece) => {
+  content.gallery = (content.gallery || []).map((piece, index) => {
     if (!Array.isArray(piece.images)) {
       piece.images = piece.image ? [piece.image] : [];
     }
     delete piece.image;
+
+    // Backfill a "when was this added" timestamp for pieces saved before
+    // this field existed, so the homepage can show newest-first. These
+    // fake timestamps are spaced out by original array position (oldest
+    // piece = earliest fake timestamp) so already-existing pieces keep
+    // their current relative order until something new is actually added.
+    if (!piece.createdAt) {
+      piece.createdAt = new Date(index * 1000).toISOString();
+    }
     return piece;
   });
 
@@ -54,18 +63,17 @@ function readContent() {
 }
 
 function sortedGalleryPieces(pieces) {
-  // Pieces aren't reordered when saved — they stay in whatever order they
-  // were added/edited in /admin — so without this, "The Collection" just
-  // shows oldest-first forever. Sort by the Year field instead (newest
-  // first), pulling out the first 4-digit number so values like "2025" or
-  // "Ongoing" both work. A piece with no parseable year (e.g. "Ongoing")
-  // sorts to the FRONT, same treatment as a missing Field Notes date —
-  // current/in-progress work should surface, not get buried.
-  const yearValue = (piece) => {
-    const match = String(piece.year || '').match(/\d{4}/);
-    return match ? parseInt(match[0], 10) : Infinity;
-  };
-  return [...(pieces || [])].sort((a, b) => yearValue(b) - yearValue(a));
+  // Newest-added piece first (based on createdAt, i.e. when it was first
+  // saved in /admin) — same idea as sortedFieldNotePosts below. A piece
+  // with no createdAt (shouldn't happen after the migration above, but
+  // just in case) sorts to the FRONT rather than silently vanishing.
+  return [...(pieces || [])].sort((a, b) => {
+    const ta = Date.parse(a.createdAt);
+    const tb = Date.parse(b.createdAt);
+    const va = Number.isNaN(ta) ? Infinity : ta;
+    const vb = Number.isNaN(tb) ? Infinity : tb;
+    return vb - va;
+  });
 }
 
 function sortedFieldNotePosts(posts) {
@@ -242,6 +250,13 @@ app.post('/admin/save', requireAuth, upload.any(), (req, res, next) => {
     const MAX_ROWS = 500;
     const MAX_IMAGES_PER_PIECE = 200;
     const newGallery = [];
+    // Look up each existing piece's createdAt (when it was first saved) by
+    // id, so editing a piece doesn't bump it to the top of "newest first" —
+    // only a genuinely new piece gets a fresh timestamp.
+    const createdAtById = {};
+    content.gallery.forEach((p) => {
+      createdAtById[p.id] = p.createdAt;
+    });
     for (let i = 0; i < MAX_ROWS; i++) {
       const title = body[`piece_title_${i}`];
       if (title === undefined) continue; // this index was never rendered/added
@@ -271,7 +286,9 @@ app.post('/admin/save', requireAuth, upload.any(), (req, res, next) => {
         images.push('/uploads/' + f.filename);
       });
 
-      newGallery.push({ id, title: trimmedTitle, category, year, images });
+      const createdAt = createdAtById[id] || new Date().toISOString();
+
+      newGallery.push({ id, title: trimmedTitle, category, year, images, createdAt });
     }
     content.gallery = newGallery;
 
