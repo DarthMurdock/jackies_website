@@ -53,6 +53,21 @@ function readContent() {
   return content;
 }
 
+function sortedGalleryPieces(pieces) {
+  // Pieces aren't reordered when saved — they stay in whatever order they
+  // were added/edited in /admin — so without this, "The Collection" just
+  // shows oldest-first forever. Sort by the Year field instead (newest
+  // first), pulling out the first 4-digit number so values like "2025" or
+  // "Ongoing" both work. A piece with no parseable year (e.g. "Ongoing")
+  // sorts to the FRONT, same treatment as a missing Field Notes date —
+  // current/in-progress work should surface, not get buried.
+  const yearValue = (piece) => {
+    const match = String(piece.year || '').match(/\d{4}/);
+    return match ? parseInt(match[0], 10) : Infinity;
+  };
+  return [...(pieces || [])].sort((a, b) => yearValue(b) - yearValue(a));
+}
+
 function sortedFieldNotePosts(posts) {
   // A post with a missing/invalid date sorts to the FRONT (treated as
   // "now"), not the back — a bad date should be obvious and easy to
@@ -132,9 +147,10 @@ app.get('/', (req, res) => {
   // trailing space) would otherwise silently filter out every piece and
   // show "Nothing in this category yet." even though matching pieces exist.
   const normalizeCategory = (c) => String(c || '').trim().toLowerCase();
+  const sortedGallery = sortedGalleryPieces(content.gallery);
   const pieces = activeCategory
-    ? content.gallery.filter((p) => normalizeCategory(p.category) === normalizeCategory(activeCategory))
-    : content.gallery;
+    ? sortedGallery.filter((p) => normalizeCategory(p.category) === normalizeCategory(activeCategory))
+    : sortedGallery;
   const latestPost = sortedFieldNotePosts(content.fieldNotes.posts)[0] || null;
 
   res.render('index', { content, categories, activeCategory, pieces, latestPost });
